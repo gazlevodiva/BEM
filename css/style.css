@@ -1,0 +1,10 @@
+#vertical_slider{
+  -webkit-appearance: slider-vertical;
+  height: 70%;
+  position: fixed;
+
+}
+#current_year{
+	bottom: 45px;
+	position: fixed;
+}

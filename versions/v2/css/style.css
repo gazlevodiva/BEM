@@ -1,0 +1,6 @@
+#vertical_slider{
+  -webkit-appearance: slider-vertical;
+  height: 80%;
+  position: fixed;
+
+}
