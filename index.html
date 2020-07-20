@@ -12,7 +12,7 @@
     <link href="css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-    <script src="js/Styles.js"></script>
+    <script src="js/main.js"></script>
 
     <title>Бизнес-Эмулятор 3000</title>
   </head>
@@ -44,9 +44,9 @@
 
 				  	<!-- PLACE FOR MARKET -->
 
-				    <div class="card mb-4 shadow-sm" style="background-color:rgba(0,0,0,.03);" id="add_market_btn">
+				    <div class="card mb-4 shadow-sm" id="add_market_btn">
 				      <div class="card-body d-flex justify-content-center">
-				        <button type="button" class="btn btn-block btn-outline-secondary" style="border: none;" onclick="add_market()"><i class="fas fa-plus"></i></button>
+				        <button type="button" class="btn btn-block btn-outline-secondary" onclick="add_market_card()"><i class="fas fa-plus"></i></button>
 				      </div>
 				    </div>
 
@@ -67,10 +67,8 @@
 				        <h4 class="my-0 font-weight-normal">Штат</h4>
 				      </div>
 				      <div class="card-body">
-				        <h2 class="card-title pricing-card-title">50 cпец<small class="text-muted" id="staff_year"></small></h2>
+				        <h2 class="card-title pricing-card-title" id="staff_specs">50 cпец<small class="text-muted"></small></h2>
 				        <ul class="list-unstyled mt-3 mb-4" id="market_specs">
-					          <li>55 / 2021</li>
-					          <li>65 / 2022</li>
 					          <li>...</li>
 					    </ul>
 				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
@@ -82,7 +80,7 @@
 				        <h4 class="my-0 font-weight-normal">Прибыль</h4>
 				      </div>
 				      <div class="card-body">
-				        <h2 class="card-title pricing-card-title">80%<small class="text-muted" id="profit_year"></small></h2>
+				        <h2 class="card-title pricing-card-title" id="profit_year">80%<small class="text-muted"></small></h2>
 				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
 				      </div>
 				    </div>
@@ -152,12 +150,11 @@
 				
 				var year_slider = document.getElementById('vertical_slider');
 				var current_year = document.getElementById('current_year');
-				var staff_year = document.getElementById('staff_year');
+				var staff_specs = document.getElementById('staff_specs');
 				var profit_year = document.getElementById('profit_year');
 				var investor_year = document.getElementById('investor_year');				
 				var credit_year = document.getElementById('credit_year');
 				var product_readiness_progressbar = document.getElementById('product_readiness_progressbar');
-
 
 				var ctx = document.getElementById('myChart').getContext('2d');
 				var config = {
@@ -174,7 +171,7 @@
 				            data: [0],
 				            fill: false,
 				        },{
-				            label: 'Затраты',
+				            label: 'Затраты %',
 				            backgroundColor: '#090b35e8',
 				            borderColor: '#090b35e8',
 				            data: [0],
@@ -216,71 +213,59 @@
 				};
 				var chart = new Chart(ctx, config);
 
-				current_year.innerHTML = YEAR;
-				staff_year.innerHTML = ' / '+YEAR;
-				profit_year.innerHTML = ' / '+YEAR;
-				investor_year.innerHTML = ' / '+YEAR;
-				credit_year.innerHTML = ' / '+YEAR;
+				current_year.innerHTML = START_YEAR;
+				staff_specs.innerHTML = STAFF[START_YEAR]+' cпец<small class="text-muted"> / '+START_YEAR+'</small>';
+				profit_year.innerHTML = '0%<small class="text-muted"> / '+START_YEAR+'</small>';
+				investor_year.innerHTML = ' / '+START_YEAR;
+				credit_year.innerHTML = ' / '+START_YEAR;
 				product_readiness_progressbar.innerHTML = 0;
 
-				var current_staff = 0;
-				var current_market_specs = 0;
-				var staff_productivity = 0;
-				var market_specs_productivity = 0;
-
+				// Main Logic
 				year_slider.oninput = function() {
-				    current_year.innerHTML = this.value;
-				    staff_year.innerHTML = ' / '+this.value;
-				    profit_year.innerHTML = ' / '+this.value;
+				    current_year.innerHTML = this.value;				    				    
 				    investor_year.innerHTML = ' / '+this.value;
 				    credit_year.innerHTML = ' / '+this.value;
+					staff_specs.innerHTML = getlast(STAFF)+' cпец<small class="text-muted"> / '+this.value+'</small>';
 
-			        // PRODUCT READINESS PROGRESS BAR
-				    product_readiness_progressbar.innerHTML = Math.round(staff_productivity*(YEAR-CURRENT_YEAR))+'%';
-				    product_readiness_progressbar.setAttribute("style", "width:"+staff_productivity*(YEAR-CURRENT_YEAR)+"%");
+					// summary market specs
+					var market_specs = 0;
 
+				    // change values for each market
+				    for (market_id in MARKET){
+						let current_market_specs = getlast(MARKET[market_id]['specs']);
+				    	let val = current_market_specs+' спец<small class="text-muted" id="market_year_'+market_id+'"> / '+this.value+'</small>';
+				    	document.getElementById('specs_market_'+market_id).innerHTML = val;
+				    	market_specs += current_market_specs;
+				    }
 
-				    if (STAFF[YEAR] === undefined) {
-					    current_staff = Object.values(STAFF)[Object.values(STAFF).length-1];
-					}else{
-						current_staff = STAFF[YEAR];
-					}
+				    //final values by consts
+					staff_productivity = 0.0954*getlast(STAFF);
+					market_specs_productivity = 0.05*market_specs;
 
-					if (Market[0]['specs'][YEAR] === undefined) {
-					    current_market_specs = Object.values(Market[0]['specs'])[Object.values(Market[0]['specs']).length-1];
-					}else{
-						current_market_specs = Market[0]['specs'][YEAR];
-					}
+					// PRODUCT READINESS PROGRESS BAR
+				    product_readiness_progressbar.innerHTML = staff_productivity*(CURRENT_YEAR-START_YEAR)+'%';
+				    product_readiness_progressbar.setAttribute("style", "width:"+staff_productivity*(CURRENT_YEAR-START_YEAR)+"%");
 
-					staff_productivity = 0.0954*current_staff;
-					market_specs_productivity = 0.05*current_market_specs;
-
-
-				    if(this.value > YEAR){
+					// SLIDER UP AND DOWN
+				    if(this.value > CURRENT_YEAR){
 				  	    config.data.labels.push(this.value);
 
 				  		// MARKET SHARE
-				  		current_market_share = (staff_productivity+market_specs_productivity)*(YEAR-CURRENT_YEAR);
+				  		current_market_share = Math.round((staff_productivity+market_specs_productivity)*(CURRENT_YEAR-START_YEAR));
 				  		config.data.datasets[0].data.push( current_market_share );
+				  		profit_year.innerHTML = Math.round(current_market_share)+'%<small class="text-muted"> / '+this.value+'</small>';
 
 				  		// EXPENSES
-				  		current_expenses = 50000 * (current_staff + current_market_specs) * 0.000001;
+				  		current_expenses = 50000 * (getlast(STAFF) + market_specs) * 0.000001;
 				  		config.data.datasets[1].data.push( current_expenses );
-
 
 				    }else{
 				  		config.data.labels.splice(-1, 1);
-
 				    }
 
-
-
-				    YEAR = this.value;
+				    CURRENT_YEAR = this.value;
 				    chart.update();
-
-
 				}
-
 			</script>
 
 		</div>

@@ -8,3 +8,11 @@
 	bottom: 45px;
 	position: fixed;
 }
+
+#add_market_btn{
+	background-color:rgba(0,0,0,.03);
+}
+
+#add_market_btn button{
+	border: none;
+}
