@@ -1,6 +1,6 @@
 var MARKET = [];
 
-var STAFF = {2020:20, 2021:50, 2022:50, 2023:80, 2024: 90, 2025: 150};
+var STAFF = {};
 
 var MARKET_SHARE = [];
 
@@ -34,13 +34,15 @@ function getlast(dict){
     var dict_values = Object.values(dict);
     var dict_keys = Object.keys(dict);
     var current_year = CURRENT_YEAR;   
-
+    if(dict_values.length == 0){
+        return 0 ;
+    }
 
     if (dict[current_year] !== undefined) {
         current_value = dict[current_year];
 
     }else if(left_neighbor(dict_keys, current_year) !== false){
-        current_value = left_neighbor(dict_keys, current_year);
+        current_value = dict[left_neighbor(dict_keys, current_year)];
     }else{
         current_value = 0;
     }
@@ -62,9 +64,6 @@ function left_neighbor(list, val){
         return Math.max(...left_neigh);
     }
 }
-
-
-
 
 
 function add_market_card(market_id){
@@ -91,6 +90,7 @@ function add_market_card(market_id){
                             fill: false
                         };
         config.data.datasets.push(newDataset);
+        config.data.datasets[market_id+2].data = [];
         chart.update();
     }
 
@@ -123,7 +123,8 @@ function add_modal(market_id, market_name){
                      '<input name="name" type="text" class="form-control mb-3" placeholder="Название рынка" id="header-elem-'+market_id+'"required></div>'+
                      '<button type="button" class="btn btn-outline-secondary" onclick="adder('+market_id+')">Добавить данные</button>'+
                      '<button type="button" class="btn btn-secondary mx-2" data-dismiss="modal">Закрыть</button>'+
-                     '<button type="button" class="btn btn-primary" onclick="AcceptMarketChange( document.getElementById(\'market_settings_'+market_id+'\').elements, '+market_id+' )">Сохранить</button></form></div></div></div></div>';
+                     '<button type="button" class="btn btn-primary" onclick="AcceptMarketChange( document.getElementById(\'market_settings_'+market_id+'\').elements, '+market_id+
+                     ' )">Сохранить</button></form></div></div></div></div>';
 
     $( elem ).insertBefore( "#add_modal_place" );
     event.preventDefault();
@@ -154,6 +155,27 @@ function AcceptMarketChange(param, market_id){
 	document.getElementById('modal_market_name_'+market_id).innerHTML = new_market_name;
 
     config.data.datasets[market_id+2].label = new_market_name;
+    config.data.datasets[market_id+2].data = [];
+    chart.update();
+}
+
+function AcceptStaffChange(param){
+    console.log(param);
+    var pp = [];
+    for(x in param){
+        if(param[x].value != undefined & param[x].value != "" ){
+            pp.push( param[x].value );
+        }
+    }
+    const a = pp;
+    const b = {};
+
+    for (let i = 0; i < a.length; i += 2) {
+      b[a[i]] = parseInt(a[i + 1])
+    }
+
+    // Меняем html + MARKET 
+    STAFF = b;
     chart.update();
 }
 

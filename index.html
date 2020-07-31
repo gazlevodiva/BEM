@@ -72,37 +72,59 @@
 				        <ul class="list-unstyled mt-3 mb-4" id="market_specs">
 					          <li>...</li>
 					    </ul>
-				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
+				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary" data-toggle="modal" data-target="#staff_modal">Настройки</button>
 				      </div>
 				    </div>
+
+				    <div class="modal fade" id="staff_modal" tabindex="-1" role="dialog" aria-labelledby="staff_modal" aria-hidden="true">
+	                    <div class="modal-dialog">
+	                    	<div class="modal-content">
+	                    		<div class="modal-header">
+	                    			<h5 class="modal-title" id="staff_modal">Настройки</h5>
+                   					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    				 	<span aria-hidden="true">&times;</span>
+                    				</button>
+                    			</div>
+                    			<div class="modal-body">
+                    			<h4 class="mb-3" id="staff_modal_name">Настройка штата сотрудников</h4>
+                   				<form id="staff_modal_settings" name="staff-form" method="post">
+                   					<div id="header-elem-staff"></div>
+	                    			<button type="button" class="btn btn-outline-secondary" onclick="adder('staff')">Добавить данные</button>
+	                   				<button type="button" class="btn btn-secondary mx-2" data-dismiss="modal">Закрыть</button>
+                   					<button type="button" class="btn btn-primary"
+                   					onclick="AcceptStaffChange( document.getElementById('staff_modal_settings').elements )">Сохранить</button>
+				                </form>
+				            </div>
+				        </div>
+				    </div>
+				</div>
 
 				    <div class="card mb-4 shadow-sm">
 				      <div class="card-header">
 				        <h4 class="my-0 font-weight-normal">Прибыль</h4>
 				      </div>
 				      <div class="card-body">
-				        <h2 class="card-title pricing-card-title" id="profit_year"><small class="text-muted"></small></h2>
-				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
+				        <h2 class="card-title pricing-card-title mt-5" id="profit_year"><small class="text-muted"></small></h2>
 				      </div>
 				    </div>
 
-				    <div class="card mb-4 shadow-sm">
+				    <div class="card mb-4 shadow-sm bg-secondary">
 				      <div class="card-header">
 				        <h4 class="my-0 font-weight-normal">Инвестор</h4>
 				      </div>
 				      <div class="card-body">
 				        <h2 class="card-title pricing-card-title" id="investor_year">$0m/0%<small class="text-muted"></small></h2>
-				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
+				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">inprocess</button>
 				      </div>
 				    </div>
 
-				    <div class="card mb-4 shadow-sm">
+				    <div class="card mb-4 shadow-sm bg-secondary">
 				      <div class="card-header">
 				        <h4 class="my-0 font-weight-normal">Кредит</h4>
 				      </div>
 				      <div class="card-body">
 				        <h2 class="card-title pricing-card-title" id="credit_year">$0/0%<small class="text-muted"></small></h2>
-				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">Настройки</button>
+				        <button type="button" class="btn btn-lg btn-block btn-outline-secondary">inprocess</button>
 				      </div>
 				    </div>
 
@@ -220,7 +242,7 @@
 				var chart = new Chart(ctx, config);
 
 				current_year.innerHTML = START_YEAR;
-				staff_specs.innerHTML = STAFF[START_YEAR]+' cпец<small class="text-muted"> / '+START_YEAR+'</small>';
+				staff_specs.innerHTML = '0 cпец<small class="text-muted"> / '+START_YEAR+'</small>';
 				profit_year.innerHTML = '0 $<small class="text-muted"> / '+START_YEAR+'</small>';
 				product_readiness_progressbar.innerHTML = 0;
 
@@ -275,7 +297,7 @@
 					// Прибыль по годам
 					PROFIT[this.value] = 0; 
 					total_market_profit = 0;
-					total_expenses = current_staff*50000;
+					total_expenses = getlast(STAFF)*50000;
 					for (x in MARKET_SHARE){	
 						if (this.value > CURRENT_YEAR){					
 							total_market_profit += MARKET_SHARE[x].reduce(reducer);
